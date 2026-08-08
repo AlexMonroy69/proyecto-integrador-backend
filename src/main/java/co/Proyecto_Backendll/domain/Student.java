@@ -1,4 +1,4 @@
-package co.Proyecto_Backendll.domain.models;
+package co.Proyecto_Backendll.domain;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -13,7 +13,7 @@ public class Student {
     private LocalDate birthDate;
     private List<Enrollment> enrollments;
 
-    public Student() {
+    public Student(Long id, String johnDoe, String mail) {
         this.enrollments = new ArrayList<>();
     }
 

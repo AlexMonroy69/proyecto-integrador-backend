@@ -1,4 +1,4 @@
-package co.Proyecto_Backendll.domain.models;
+package co.Proyecto_Backendll.domain;
 
 public enum EnrollmentStatus {
 

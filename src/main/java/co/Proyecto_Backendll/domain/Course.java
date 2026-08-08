@@ -1,4 +1,4 @@
-package co.Proyecto_Backendll.domain.models;
+package co.Proyecto_Backendll.domain;
 
 import java.util.ArrayList;
 import java.util.List;

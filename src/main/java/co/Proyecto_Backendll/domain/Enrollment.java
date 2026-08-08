@@ -1,4 +1,4 @@
-package co.Proyecto_Backendll.domain.models;
+package co.Proyecto_Backendll.domain;
 
 import java.time.LocalDate;
 
@@ -10,7 +10,7 @@ public class Enrollment {
     private LocalDate enrollmentDate;
     private EnrollmentStatus status;
 
-    public Enrollment() {
+    public Enrollment(Long id, long l, long l1) {
     }
 
     public Enrollment(Long id, Student student, Course course, LocalDate enrollmentDate, EnrollmentStatus status) {

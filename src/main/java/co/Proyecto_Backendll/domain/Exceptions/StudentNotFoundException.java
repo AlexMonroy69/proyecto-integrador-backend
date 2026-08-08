@@ -1,4 +1,4 @@
-package co.Proyecto_Backendll.application.Exceptions;
+package co.Proyecto_Backendll.domain.Exceptions;
 
 public class StudentNotFoundException extends RuntimeException {
 
