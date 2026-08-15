@@ -1,7 +1,6 @@
 package co.Proyecto_Backendll.application.service;
 
 import co.Proyecto_Backendll.domain.Course;
-import co.Proyecto_Backendll.domain.Enrollment;
 import co.Proyecto_Backendll.domain.repository.CourseRepository;
 
 import java.util.List;
