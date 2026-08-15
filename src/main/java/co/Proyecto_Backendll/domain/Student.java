@@ -1,21 +1,40 @@
 package co.Proyecto_Backendll.domain;
 
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
+@Table(name = "students")
 public class Student {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String firstName;
-    private String lastName;
-    private String email;
-    private LocalDate birthDate;
-    private List<Enrollment> enrollments;
 
-    public Student(Long id, String johnDoe, String mail) {
-        this.enrollments = new ArrayList<>();
-    }
+    @Column(name = "first_name", nullable = false)
+    @NotEmpty
+    private String firstName;
+
+    @Column(name = "last_name", nullable = false)
+    @NotEmpty
+    private String lastName;
+
+    @Column(unique = true, nullable = false)
+    @Email
+    private String email;
+
+    @NotNull
+    private LocalDate birthDate;
+
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
+    private List<Enrollment> enrollments = new ArrayList<>();
+
+    public Student() {}
 
     public Student(Long id, String firstName, String lastName, String email, LocalDate birthDate) {
         this.id = id;
@@ -25,6 +44,8 @@ public class Student {
         this.birthDate = birthDate;
         this.enrollments = new ArrayList<>();
     }
+
+    // --- GETTERS Y SETTERS (AQUÍ ESTABA EL PROBLEMA) ---
 
     public Long getId() {
         return id;

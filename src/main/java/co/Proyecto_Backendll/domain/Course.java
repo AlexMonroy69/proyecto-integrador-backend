@@ -1,20 +1,26 @@
 package co.Proyecto_Backendll.domain;
 
+import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
+@Table(name = "courses")
 public class Course {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String code;
     private String name;
     private String description;
     private Integer maxCapacity;
-    private List<Enrollment> enrollments;
 
-    public Course() {
-        this.enrollments = new ArrayList<>();
-    }
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
+    private List<Enrollment> enrollments = new ArrayList<>();
+
+    public Course() {}
 
     public Course(Long id, String code, String name, String description, Integer maxCapacity) {
         this.id = id;
@@ -24,6 +30,8 @@ public class Course {
         this.maxCapacity = maxCapacity;
         this.enrollments = new ArrayList<>();
     }
+
+    // --- GETTERS Y SETTERS ---
 
     public Long getId() {
         return id;
@@ -75,7 +83,6 @@ public class Course {
 
     @Override
     public String toString() {
-
         return "Course{" +
                 "id=" + id +
                 ", code='" + code + '\'' +
