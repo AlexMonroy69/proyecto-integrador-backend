@@ -2,14 +2,13 @@ package co.Proyecto_Backendll.application.service;
 
 import co.Proyecto_Backendll.domain.Student;
 import co.Proyecto_Backendll.domain.repository.StudentRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
-
-
-
-public class StudentService implements StudentRepository {
+@Service
+public class StudentService {
 
     private final StudentRepository studentRepository;
 
@@ -17,48 +16,34 @@ public class StudentService implements StudentRepository {
         this.studentRepository = studentRepository;
     }
 
-    @Override
-    public List<Student> findAll() {
-        return List.of();
+    public List<Student> getAllStudents() {
+        return studentRepository.findAll();
     }
 
-    @Override
-    public Optional<Student> findByName(String name) {
-        return Optional.empty();
+    public Optional<Student> getStudentById(Long id) {
+        return studentRepository.findById(id);
     }
 
-    @Override
-    public Student save(Student student) {
+    public Student createStudent(Student student) {
         return studentRepository.save(student);
     }
 
-    @Override
-    public void deleteById(Long id) {
-        studentRepository.deleteById(id);
+    public Optional<Student> updateStudent(Student student) {
+        if (student == null || student.getId() == null) {
+            return Optional.empty();
+        }
+
+        return studentRepository.findById(student.getId())
+                .map(existingStudent -> studentRepository.save(student));
     }
 
-    @Override
-    public boolean existsByStudentId(Long studentId) {
-        return studentRepository.existsByStudentId(studentId);
-    }
-
-    @Override
-    public boolean existsByEmail(String email) {
-        return studentRepository.existsByEmail(email);
-    }
-
-    @Override
     public void deleteStudentById(Long id) {
-        if (studentRepository.existsByStudentId(id)) {
+        if (studentRepository.existsById(id)) {
             studentRepository.deleteById(id);
         }
     }
 
-    @Override
-    public Optional<Student> update(Student student) {
-        if (studentRepository.existsByStudentId(student.getId())) {
-            return Optional.of(studentRepository.save(student));
-        }
-        return Optional.empty();
+    public boolean existsByEmail(String email) {
+        return studentRepository.existsByEmail(email);
     }
 }
