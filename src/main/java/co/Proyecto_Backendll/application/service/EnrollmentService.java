@@ -18,8 +18,8 @@ public class EnrollmentService {
         return enrollmentRepository.findAll();
     }
 
-    public Optional<Enrollment> findByName(String name) {
-        return enrollmentRepository.findByName(name);
+    public Optional<Enrollment> findById(Long id) {
+        return enrollmentRepository.findById(id);
     }
 
     public Enrollment save(Enrollment enrollment) {
@@ -31,11 +31,14 @@ public class EnrollmentService {
     }
 
     public Optional<Enrollment> update(Enrollment enrollment) {
-        return enrollmentRepository.update(enrollment);
+        if (enrollment.getId() != null && enrollmentRepository.existsById(enrollment.getId())) {
+            return Optional.of(enrollmentRepository.save(enrollment));
+        }
+        return Optional.empty();
     }
 
     public boolean existsByEnrollmentId(Long enrollmentId) {
-        return enrollmentRepository.existsByEnrollmentId(enrollmentId);
+        return enrollmentRepository.existsById(enrollmentId);
     }
 
 }

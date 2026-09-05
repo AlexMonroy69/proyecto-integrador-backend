@@ -1,6 +1,10 @@
 package co.Proyecto_Backendll.domain.Exceptions;
 
-public class EnrollmentNotFoundException extends RuntimeException {
+public class EnrollmentNotFoundException extends BusinessException {
+
+    public EnrollmentNotFoundException(Long id) {
+        super("Enrollment not found with id: " + id);
+    }
 
     public EnrollmentNotFoundException(String message) {
         super(message);

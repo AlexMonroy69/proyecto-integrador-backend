@@ -31,17 +31,20 @@ public class CourseService {
     }
 
     public Optional<Course> updateCourse(Course course) {
-        return courseRepository.update(course);
+        if (course.getId() != null && courseRepository.existsById(course.getId())) {
+            return Optional.of(courseRepository.save(course));
+        }
+        return Optional.empty();
     }
 
     public void deleteCourseById(Long id) {
-        if (courseRepository.findById(id).isPresent()) {
+        if (courseRepository.existsById(id)) {
             courseRepository.deleteById(id);
         }
     }
 
     public Course existsByCourseId(Course course) {
-        if (course.getId() != null && courseRepository.findById(course.getId()).isPresent()) {
+        if (course.getId() != null && courseRepository.existsById(course.getId())) {
             return courseRepository.findById(course.getId()).get();
         }
         return courseRepository.save(course);
