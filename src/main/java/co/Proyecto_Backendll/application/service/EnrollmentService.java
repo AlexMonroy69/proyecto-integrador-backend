@@ -6,41 +6,38 @@ import co.Proyecto_Backendll.domain.repository.EnrollmentRepository;
 import java.util.List;
 import java.util.Optional;
 
-public class EnrollmentService implements EnrollmentRepository {
+public class EnrollmentService {
 
-    EnrollmentRepository enrollmentRepository;
+    protected final EnrollmentRepository enrollmentRepository;
+
     public EnrollmentService(EnrollmentRepository enrollmentRepository) {
         this.enrollmentRepository = enrollmentRepository;
     }
 
-
-    @Override
     public List<Enrollment> findAll() {
-        return List.of();
+        return enrollmentRepository.findAll();
     }
 
-    @Override
     public Optional<Enrollment> findByName(String name) {
-        return Optional.empty();
+        return enrollmentRepository.findByName(name);
     }
 
-    @Override
     public Enrollment save(Enrollment enrollment) {
-        return null;
+        return enrollmentRepository.save(enrollment);
     }
 
-    @Override
     public void deleteById(Long id) {
-
+        enrollmentRepository.deleteById(id);
     }
 
-    @Override
     public Optional<Enrollment> update(Enrollment enrollment) {
-        return Optional.empty();
+        return enrollmentRepository.update(enrollment);
     }
 
-    @Override
     public boolean existsByEnrollmentId(Long enrollmentId) {
-        return false;
+        return enrollmentRepository.existsByEnrollmentId(enrollmentId);
     }
+
 }
+
+

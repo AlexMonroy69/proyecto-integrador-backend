@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public class CourseService {
 
-    CourseRepository courseRepository;
+    protected final CourseRepository courseRepository;
 
     public CourseService(CourseRepository courseRepository) {
         this.courseRepository = courseRepository;
@@ -40,10 +40,15 @@ public class CourseService {
         }
     }
 
-    public boolean existsByCourseId(Course course) {
-        if (courseRepository.findById(course.getId()).isPresent()) {
-            return true;
+    public Course existsByCourseId(Course course) {
+        if (course.getId() != null && courseRepository.findById(course.getId()).isPresent()) {
+            return courseRepository.findById(course.getId()).get();
         }
-        return false;
+        return courseRepository.save(course);
     }
+
+    public Course save(Course course) {
+        return createCourse(course);
+    }
+
 }
