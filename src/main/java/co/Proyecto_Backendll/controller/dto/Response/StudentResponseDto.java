@@ -1,4 +1,4 @@
-package co.Proyecto_Backendll.controller.dto;
+package co.Proyecto_Backendll.controller.dto.Response;
 
 import co.Proyecto_Backendll.domain.Student;
 import java.time.LocalDate;

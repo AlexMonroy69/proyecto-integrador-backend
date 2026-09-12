@@ -57,4 +57,5 @@ public class CourseModel {
     public void setMaxCapacity(Integer maxCapacity) {
         this.maxCapacity = maxCapacity;
     }
+
 }

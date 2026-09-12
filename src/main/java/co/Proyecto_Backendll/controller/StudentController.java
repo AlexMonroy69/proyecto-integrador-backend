@@ -2,8 +2,9 @@ package co.Proyecto_Backendll.controller;
 
 import co.Proyecto_Backendll.application.service.StudentService;
 import co.Proyecto_Backendll.controller.dto.CreateStudentDto;
-import co.Proyecto_Backendll.controller.dto.ErrorResponse;
-import co.Proyecto_Backendll.controller.dto.StudentResponseDto;
+import co.Proyecto_Backendll.controller.dto.Response.ErrorResponse;
+import co.Proyecto_Backendll.controller.dto.Response.StudentResponseDto;
+import co.Proyecto_Backendll.controller.dto.UpdateStudentDto;
 import co.Proyecto_Backendll.domain.Exceptions.BusinessException;
 import co.Proyecto_Backendll.domain.Exceptions.StudentEmailAlreadyExistsException;
 import co.Proyecto_Backendll.domain.Exceptions.StudentNotFoundException;
@@ -37,7 +38,7 @@ public class StudentController {
     @GetMapping("/{id}")
     public ResponseEntity<Object> getById(@PathVariable Long id) {
         try {
-            var student = studentService.getStudentById(id)
+            Student student = (Student) studentService.getStudentById(id)
                     .orElseThrow(() -> new StudentNotFoundException(id));
             return ResponseEntity.ok(StudentResponseDto.from(student));
         } catch (StudentNotFoundException e) {
@@ -51,19 +52,18 @@ public class StudentController {
             if (studentService.existsByEmail(createStudentDto.email())) {
                 throw new StudentEmailAlreadyExistsException(createStudentDto.email());
             }
-            var created = studentService.createStudent(createStudentDto.toStudent());
-            return ResponseEntity.status(HttpStatus.CREATED).body(StudentResponseDto.from(created));
+            var created = studentService.create(createStudentDto.toStudent());
+            return ResponseEntity.status(HttpStatus.CREATED).body(StudentResponseDto.from((Student) created));
         } catch (BusinessException e) {
             return ResponseEntity.badRequest().body(ErrorResponse.of(e.getMessage()));
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Object> update(@PathVariable Long id, @RequestBody CreateStudentDto updateStudentDto) {
+    public ResponseEntity<Object> update(@PathVariable Long id, @RequestBody UpdateStudentDto updateStudentDto) {
         try {
-            var student = new Student(id, updateStudentDto.firstName(), updateStudentDto.lastName(),
-                    updateStudentDto.email(), updateStudentDto.birthDate());
-            var updated = studentService.updateStudent(student)
+            Student student = updateStudentDto.toStudent(id);
+            Student updated = (Student) studentService.update(student)
                     .orElseThrow(() -> new StudentNotFoundException(id));
             return ResponseEntity.ok(StudentResponseDto.from(updated));
         } catch (StudentNotFoundException e) {
@@ -74,7 +74,7 @@ public class StudentController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> delete(@PathVariable Long id) {
         try {
-            studentService.deleteStudentById(id);
+            studentService.getStudentById(id);
             return ResponseEntity.noContent().build();
         } catch (StudentNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ErrorResponse.of(e.getMessage()));

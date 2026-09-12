@@ -1,4 +1,4 @@
-package co.Proyecto_Backendll.controller.dto;
+package co.Proyecto_Backendll.controller.dto.Response;
 
 import java.time.LocalDateTime;
 
