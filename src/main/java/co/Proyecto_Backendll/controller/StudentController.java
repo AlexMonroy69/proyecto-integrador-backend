@@ -1,17 +1,16 @@
 package co.Proyecto_Backendll.controller;
 
-import co.Proyecto_Backendll.application.service.StudentService;
 import co.Proyecto_Backendll.controller.dto.CreateStudentDto;
-import co.Proyecto_Backendll.controller.dto.Response.ErrorResponse;
-import co.Proyecto_Backendll.controller.dto.Response.StudentResponseDto;
 import co.Proyecto_Backendll.controller.dto.UpdateStudentDto;
-import co.Proyecto_Backendll.domain.Exceptions.BusinessException;
-import co.Proyecto_Backendll.domain.Exceptions.StudentEmailAlreadyExistsException;
+import co.Proyecto_Backendll.controller.dto.Response.StudentResponseDto;
 import co.Proyecto_Backendll.domain.Exceptions.StudentNotFoundException;
 import co.Proyecto_Backendll.domain.Student;
+import co.Proyecto_Backendll.application.service.StudentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/students")
@@ -24,63 +23,38 @@ public class StudentController {
     }
 
     @GetMapping
-    public ResponseEntity<Object> list() {
-        try {
-            var students = studentService.getAllStudents().stream()
-                    .map(StudentResponseDto::from)
-                    .toList();
-            return ResponseEntity.ok(students);
-        } catch (BusinessException e) {
-            return ResponseEntity.badRequest().body(ErrorResponse.of(e.getMessage()));
-        }
+    public ResponseEntity<List<StudentResponseDto>> list() {
+        List<StudentResponseDto> students = studentService.findAll()
+                .stream()
+                .map(StudentResponseDto::from)
+                .toList();
+        return ResponseEntity.ok(students);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getById(@PathVariable Long id) {
-        try {
-            Student student = (Student) studentService.getStudentById(id)
-                    .orElseThrow(() -> new StudentNotFoundException(id));
-            return ResponseEntity.ok(StudentResponseDto.from(student));
-        } catch (StudentNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ErrorResponse.of(e.getMessage()));
-        }
+    public ResponseEntity<StudentResponseDto> getById(@PathVariable Long id) {
+        Student student = studentService.findById(id)
+                .orElseThrow(); // Si no existe, lanza la excepción y el GlobalExceptionHandler la atrapa
+        return ResponseEntity.ok(StudentResponseDto.from(student));
     }
 
     @PostMapping
-    public ResponseEntity<Object> create(@RequestBody CreateStudentDto createStudentDto) {
-        try {
-            if (studentService.existsByEmail(createStudentDto.email())) {
-                throw new StudentEmailAlreadyExistsException(createStudentDto.email());
-            }
-            var created = studentService.create(createStudentDto.toStudent());
-            return ResponseEntity.status(HttpStatus.CREATED).body(StudentResponseDto.from((Student) created));
-        } catch (BusinessException e) {
-            return ResponseEntity.badRequest().body(ErrorResponse.of(e.getMessage()));
-        }
+    public ResponseEntity<StudentResponseDto> create(@RequestBody CreateStudentDto createStudentDto) {
+        Student student = studentService.create(createStudentDto.toStudent());
+        return ResponseEntity.status(HttpStatus.CREATED).body(StudentResponseDto.from(student));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Object> update(@PathVariable Long id, @RequestBody UpdateStudentDto updateStudentDto) {
-        try {
-            Student student = updateStudentDto.toStudent(id);
-            Student updated = (Student) studentService.update(student)
-                    .orElseThrow(() -> new StudentNotFoundException(id));
-            return ResponseEntity.ok(StudentResponseDto.from(updated));
-        } catch (StudentNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ErrorResponse.of(e.getMessage()));
-        }
+    public ResponseEntity<StudentResponseDto> update(@PathVariable Long id, @RequestBody UpdateStudentDto updateStudentDto) {
+        Student student = updateStudentDto.toStudent(id);
+        Student updated = (Student) studentService.update(student)
+                .orElseThrow(() -> new StudentNotFoundException(id));
+        return ResponseEntity.ok(StudentResponseDto.from(updated));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Object> delete(@PathVariable Long id) {
-        try {
-            studentService.getStudentById(id);
-            return ResponseEntity.noContent().build();
-        } catch (StudentNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ErrorResponse.of(e.getMessage()));
-        } catch (BusinessException e) {
-            return ResponseEntity.badRequest().body(ErrorResponse.of(e.getMessage()));
-        }
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        studentService.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
-
 }

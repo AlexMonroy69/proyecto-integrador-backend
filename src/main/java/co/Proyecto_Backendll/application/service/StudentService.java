@@ -16,7 +16,6 @@ public interface StudentService {
     boolean existsByEmail(String email);
     List<Course> findAll();
     Optional<Student> findByName(String name);
-
     boolean existsByStudentId(Long studentId);
 
     List<Student> getAllStudents();

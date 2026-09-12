@@ -5,8 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "courses")
-public class Course {
+public class Course extends Student {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

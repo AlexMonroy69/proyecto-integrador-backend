@@ -15,7 +15,6 @@ public  class StudentServiceImpl implements StudentService {
 
     private final StudentRepository studentRepository;
 
-    // Inyección correcta del repositorio de estudiantes
     public StudentServiceImpl(StudentRepository studentRepository) {
         this.studentRepository = studentRepository;
     }
@@ -70,7 +69,7 @@ public  class StudentServiceImpl implements StudentService {
 
     @Override
     public boolean existsByEmail(String email) {
-        return false;
+        return studentRepository.existsByEmail(email);
     }
 
     @Override

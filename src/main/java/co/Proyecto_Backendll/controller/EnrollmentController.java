@@ -1,13 +1,15 @@
 package co.Proyecto_Backendll.controller;
 
-import co.Proyecto_Backendll.application.service.EnrollmentService;
-import co.Proyecto_Backendll.controller.dto.Response.ErrorResponse;
+import co.Proyecto_Backendll.controller.dto.CreateEnrollmentDto;
+import co.Proyecto_Backendll.controller.dto.Response.EnrollmentResponseDto;
 import co.Proyecto_Backendll.domain.Enrollment;
-import co.Proyecto_Backendll.domain.Exceptions.BusinessException;
+import co.Proyecto_Backendll.application.service.EnrollmentService;
 import co.Proyecto_Backendll.domain.Exceptions.EnrollmentNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/enrollments")
@@ -20,58 +22,30 @@ public class EnrollmentController {
     }
 
     @GetMapping
-    public ResponseEntity<Object> list() {
-        try {
-            var enrollments = enrollmentService.findAll();
-            return ResponseEntity.ok(enrollments);
-        } catch (BusinessException e) {
-            return ResponseEntity.badRequest().body(ErrorResponse.of(e.getMessage()));
-        }
+    public ResponseEntity<List<EnrollmentResponseDto>> list() {
+        List<EnrollmentResponseDto> enrollments = enrollmentService.findAll()
+                .stream()
+                .map(EnrollmentResponseDto::from)
+                .toList();
+        return ResponseEntity.ok(enrollments);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getById(@PathVariable Long id) {
-        try {
-            Enrollment enrollment = enrollmentService.findById(id)
-                    .orElseThrow(() -> new EnrollmentNotFoundException(id));
-            return ResponseEntity.ok(enrollment);
-        } catch (EnrollmentNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ErrorResponse.of(e.getMessage()));
-        }
+    public ResponseEntity<EnrollmentResponseDto> getById(@PathVariable Long id) {
+        Enrollment enrollment = enrollmentService.findById(id)
+                .orElseThrow(() -> new EnrollmentNotFoundException(id));
+        return ResponseEntity.ok(EnrollmentResponseDto.from(enrollment));
     }
 
     @PostMapping
-    public ResponseEntity<Object> create(@RequestBody Enrollment enrollment) {
-        try {
-            var created = enrollmentService.create(enrollment);
-            return ResponseEntity.status(HttpStatus.CREATED).body(created);
-        } catch (BusinessException e) {
-            return ResponseEntity.badRequest().body(ErrorResponse.of(e.getMessage()));
-        }
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<Object> update(@PathVariable Long id, @RequestBody Enrollment enrollment) {
-        try {
-            enrollment.setId(id);
-            Enrollment updated = enrollmentService.update(enrollment)
-                    .orElseThrow(() -> new EnrollmentNotFoundException(id));
-            return ResponseEntity.ok(updated);
-        } catch (EnrollmentNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ErrorResponse.of(e.getMessage()));
-        }
+    public ResponseEntity<EnrollmentResponseDto> create(@RequestBody CreateEnrollmentDto createEnrollmentDto) {
+        Enrollment enrollment = enrollmentService.create(createEnrollmentDto.toEnrollment());
+        return ResponseEntity.status(HttpStatus.CREATED).body(EnrollmentResponseDto.from(enrollment));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Object> delete(@PathVariable Long id) {
-        try {
-            enrollmentService.findById(id).orElseThrow(() -> new EnrollmentNotFoundException(id));
-            enrollmentService.deleteById(id);
-            return ResponseEntity.noContent().build();
-        } catch (EnrollmentNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ErrorResponse.of(e.getMessage()));
-        } catch (BusinessException e) {
-            return ResponseEntity.badRequest().body(ErrorResponse.of(e.getMessage()));
-        }
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        enrollmentService.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }
