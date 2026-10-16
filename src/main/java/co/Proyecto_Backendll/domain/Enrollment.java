@@ -33,10 +33,6 @@ public class Enrollment {
         this.status = status;
     }
 
-    public Enrollment(Long id, Long studentId, Long courseId, LocalDate enrollmentDate, String status) {
-    }
-
-    // Getters y Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public Student getStudent() { return student; }

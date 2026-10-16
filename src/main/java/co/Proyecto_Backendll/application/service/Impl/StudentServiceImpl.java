@@ -1,17 +1,19 @@
 package co.Proyecto_Backendll.application.service.Impl;
 
 import co.Proyecto_Backendll.application.service.StudentService;
-import co.Proyecto_Backendll.domain.Course;
+import co.Proyecto_Backendll.domain.Exceptions.StudentEmailAlreadyExistsException;
+import co.Proyecto_Backendll.domain.Exceptions.StudentNotFoundException;
 import co.Proyecto_Backendll.domain.Student;
 import co.Proyecto_Backendll.domain.repository.StudentRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
-
 @Service
-public  class StudentServiceImpl implements StudentService {
+@Transactional
+public class StudentServiceImpl implements StudentService {
 
     private final StudentRepository studentRepository;
 
@@ -20,70 +22,63 @@ public  class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public List<Student> getAllStudents() {
-        return studentRepository.findAll();
-    }
-
-    @Override
-    public Optional<Student> getStudentById(Long id) {
-        return studentRepository.findById(id);
-    }
-
-    @Override
     public Student create(Student student) {
+        if (studentRepository.existsByEmail(student.getEmail())) {
+            throw new StudentEmailAlreadyExistsException(student.getEmail());
+        }
         return studentRepository.save(student);
     }
 
     @Override
-    public Course create(Course course) {
-        return null;
+    @Transactional(readOnly = true)
+    public List<Student> findAll() {
+        return studentRepository.findAll();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Student> findById(Long id) {
+        return studentRepository.findById(id);
     }
 
     @Override
     public Optional<Student> update(Student student) {
-        if (studentRepository.existsById(student.getId())) {
-            return Optional.of(studentRepository.save(student));
+        Optional<Student> existing = studentRepository.findById(student.getId());
+        if (existing.isEmpty()) {
+            return Optional.empty();
         }
-        return Optional.empty();
-    }
 
-    @Override
-    public Optional<Course> findById(Long id) {
-        return Optional.empty();
-    }
+        if (studentRepository.existsByEmailAndIdNot(student.getEmail(), student.getId())) {
+            throw new StudentEmailAlreadyExistsException(student.getEmail());
+        }
 
-    @Override
-    public Optional<Course> update(Course course) {
-        return Optional.empty();
+        Student current = existing.get();
+        current.setFirstName(student.getFirstName());
+        current.setLastName(student.getLastName());
+        current.setEmail(student.getEmail());
+        current.setPhone(student.getPhone());
+        current.setBirthDate(student.getBirthDate());
+
+        return Optional.of(studentRepository.save(current));
     }
 
     @Override
     public void deleteById(Long id) {
+        if (!studentRepository.existsById(id)) {
+            throw new StudentNotFoundException(id);
+        }
         studentRepository.deleteById(id);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public boolean existsById(Long id) {
-        return false;
+        return studentRepository.existsById(id);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public boolean existsByEmail(String email) {
         return studentRepository.existsByEmail(email);
-    }
-
-    @Override
-    public List<Course> findAll() {
-        return List.of();
-    }
-
-    @Override
-    public Optional<Student> findByName(String name) {
-        return Optional.empty();
-    }
-
-    @Override
-    public boolean existsByStudentId(Long studentId) {
-        return false;
     }
 }

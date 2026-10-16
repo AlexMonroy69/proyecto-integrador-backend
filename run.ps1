@@ -1,44 +1,31 @@
-# Script para descargar Maven y ejecutar la aplicación
+# Descarga Maven (si no esta instalado) y ejecuta la aplicacion
 
-$mavenVersion = "3.8.1"
-$mavenUrl = "https://archive.apache.org/dist/maven/maven-3/$mavenVersion/apache-maven-$mavenVersion-bin.zip"
-$mavenHome = "$env:USERPROFILE\.maven\apache-maven-$mavenVersion"
-$mavenZip = "$env:USERPROFILE\.maven\apache-maven-$mavenVersion-bin.zip"
+$mavenVersion = "3.9.9"
+$mavenUrl = "https://archive.apache.org/dist/maven/maven-3/$mavenVersion/binaries/apache-maven-$mavenVersion-bin.zip"
+$mavenRoot = "$env:USERPROFILE\.maven"
+$mavenHome = "$mavenRoot\apache-maven-$mavenVersion"
+$mavenZip = "$mavenRoot\apache-maven-$mavenVersion-bin.zip"
 
-# Crear directorio si no existe
-if (-not (Test-Path "$env:USERPROFILE\.maven")) {
-    New-Item -ItemType Directory -Path "$env:USERPROFILE\.maven" | Out-Null
+if (-not (Test-Path $mavenRoot)) {
+    New-Item -ItemType Directory -Path $mavenRoot | Out-Null
 }
 
-# Descargar Maven si no existe
 if (-not (Test-Path $mavenHome)) {
     Write-Host "Descargando Maven $mavenVersion..." -ForegroundColor Green
     try {
-        # Intentar con curl primero
-        curl -L -o $mavenZip $mavenUrl
+        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+        Invoke-WebRequest -Uri $mavenUrl -OutFile $mavenZip -UseBasicParsing
     }
     catch {
-        Write-Host "curl falló, intentando con WebClient..." -ForegroundColor Yellow
-        $client = New-Object System.Net.ServicePointManager
-        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
-
-        $web = New-Object System.Net.WebClient
-        $web.DownloadFile($mavenUrl, $mavenZip)
-    }
-
-    if (Test-Path $mavenZip) {
-        Write-Host "Extrayendo Maven..." -ForegroundColor Green
-        Expand-Archive -Path $mavenZip -DestinationPath "$env:USERPROFILE\.maven" -Force
-        Remove-Item $mavenZip
-    }
-    else {
-        Write-Host "Error: No se pudo descargar Maven" -ForegroundColor Red
+        Write-Host "Error: No se pudo descargar Maven ($($_.Exception.Message))" -ForegroundColor Red
         exit 1
     }
+
+    Write-Host "Extrayendo Maven..." -ForegroundColor Green
+    Expand-Archive -Path $mavenZip -DestinationPath $mavenRoot -Force
+    Remove-Item $mavenZip
 }
 
-# Ejecutar Maven
-Write-Host "Ejecutando aplicación en puerto 8081..." -ForegroundColor Green
+Write-Host "Ejecutando aplicacion en http://localhost:8888 ..." -ForegroundColor Green
 $env:PATH = "$mavenHome\bin;$env:PATH"
 & mvn clean spring-boot:run
-

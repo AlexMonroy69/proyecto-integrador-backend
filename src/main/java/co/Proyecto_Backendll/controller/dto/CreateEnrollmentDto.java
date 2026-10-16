@@ -1,17 +1,16 @@
 package co.Proyecto_Backendll.controller.dto;
 
-import co.Proyecto_Backendll.domain.Enrollment;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
 
 import java.time.LocalDate;
 
 public record CreateEnrollmentDto(
-        Long studentId,
-        Long courseId,
-        LocalDate enrollmentDate,
-        String status
+        @NotNull Long studentId,
+        @NotNull Long courseId,
+        @PastOrPresent
+        @JsonFormat(pattern = "yyyy-MM-dd")
+        LocalDate enrollmentDate
 ) {
-
-    public Enrollment toEnrollment() {
-        return new Enrollment(null, studentId, courseId, enrollmentDate, status);
-    }
 }

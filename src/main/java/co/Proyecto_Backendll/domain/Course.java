@@ -1,11 +1,13 @@
 package co.Proyecto_Backendll.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class Course extends Student {
+@Table(name = "courses")
+public class Course {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,6 +19,7 @@ public class Course extends Student {
     private Integer maxCapacity;
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Enrollment> enrollments = new ArrayList<>();
 
     public Course() {}
@@ -27,10 +30,7 @@ public class Course extends Student {
         this.name = name;
         this.description = description;
         this.maxCapacity = maxCapacity;
-        this.enrollments = new ArrayList<>();
     }
-
-    // --- GETTERS Y SETTERS ---
 
     public Long getId() {
         return id;
